@@ -221,7 +221,7 @@ namespace
         { // check query is on edge
             for (std::size_t i = 0; i < points.size(); ++i)
             {
-                if (i == points.size())
+                if (i == points.size() - 1)
                 {
                     if (IsOnLineSegment(query, points[i], points[0]))
                         return true;
@@ -234,12 +234,10 @@ namespace
             }
         }
         { // ray casting algorithm
-            auto cog = Eigen::Vector3d(0.0e0, 0.0e0, 0.0e0);
-            cog /= (double)(points.size());
             double squered_dist = 0.0e0;
             for (std::size_t i = 0; i < points.size(); ++i)
             {
-                squered_dist = std::max(squered_dist, (points[i] - cog).squaredNorm());
+                squered_dist = std::max(squered_dist, (points[i] - query).squaredNorm());
             } // for i
             auto dist = std::sqrt(squered_dist);
             auto ray_length = dist * 2.0e0;
@@ -248,6 +246,7 @@ namespace
             { // find intersection
                 while (true)
                 {
+                    num_of_intersection = 0;
                     bool try_other_direction = false;
                     Eigen::Vector3d direction_vector = Eigen::Vector3d(1.0e0, 1.0e0, 1.0e0);
                     { // select direction vector
@@ -272,7 +271,9 @@ namespace
                         } // else if
                         else
                         {
-                            break; // here, give up to find good direction vector
+                            std::cout << "FATAL ERROR" << std::endl;
+                            exit(1);
+                            // break; // here, give up to find good direction vector
                         }
                         direction_vector.normalize();
                     }
@@ -281,7 +282,7 @@ namespace
                     for (std::size_t i = 0; i < points.size(); ++i)
                     {
                         Eigen::Vector3d edge_p1, edge_p2;
-                        if (i == points.size())
+                        if (i == points.size() - 1)
                         {
                             edge_p1 = points[i];
                             edge_p2 = points[0];
@@ -309,8 +310,10 @@ namespace
                     }
                     if (!try_other_direction)
                         break;
+
                 }
             }
+            std::cout << "num of intersection " << num_of_intersection << std::endl;
             if (num_of_intersection % 2 == 0)
             {
                 return false;
@@ -349,14 +352,14 @@ int main()
         auto pe = GetPlaneEquation(points[0], points[1], points[2]);
         std::vector<Eigen::Vector3d> queries;
         std::size_t count = 0;
-        for (std::size_t i = 0; i < 100; ++i)
+        for (std::size_t i = 0; i < 10000; ++i)
         {
             Eigen::Vector3d p;
             p.x() = rand(mt);
             p.y() = rand(mt);
             p.z() = -1.0e0 * (pe.a_ * p.x() + pe.b_ * p.y() + pe.d_) / pe.c_;
             queries.push_back(p);
-            if (!IsInsidePolygon3d(p, points))
+            if (IsInsidePolygon3d(p, points))
             {
                 count++;
             }
@@ -369,7 +372,7 @@ int main()
                   << std::endl;
         for (std::size_t i = 0; i < queries.size(); ++i)
         {
-            if (!IsInsidePolygon3d(queries[i], points))
+            if (IsInsidePolygon3d(queries[i], points))
             {
                 std::cout << std::setprecision(13)
                           << queries[i].x() << "  "
