@@ -13,13 +13,12 @@ macro(SET_TEMPLATE_VARIABLES)
             )
         set(
             TEMPLATE_SOURCE_DIR
-            "${MY_MODULE_PATH}/../src/child"
-            "${MY_MODULE_PATH}/../src/parent"
+            "${MY_MODULE_PATH}/../src"
             )
         set(
             TEMPLATE_INCLUDE_DIR
-            "${MY_MODULE_PATH}/../src/child"
-            "${MY_MODULE_PATH}/../src/parent"
+            "/opt/eigen-3.3.9"
+            "${MY_MODULE_PATH}/../src"
             )
     endif()
 endmacro()
