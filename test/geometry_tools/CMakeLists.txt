@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(TEMPLATE_01 CXX)
-set(TEST_NAME "UNIT_TEST_${PROJECT_NAME}")
+project(GoemetryTools CXX)
+set(TEST_NAME "UnitTest_${PROJECT_NAME}")
 
 file(GLOB SOURCE "*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCE})
