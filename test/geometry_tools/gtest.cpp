@@ -79,7 +79,7 @@ TEST(UnitTest_IntersectionTwoLine3d, Paralell_1)
     auto p3 = Eigen::Vector3d(-3.0e0, -1.0e0, 8.0e0);
     auto p4 = Eigen::Vector3d(10.0e0, -8.0e0, 7.0e0);
     Eigen::Vector3d intersection;
-    EXPECT_FALSE(geometry::hasIntersectionOfLine3dSegmentAndLine3dSegment(p1, p2, p3, p4, intersection));
+    EXPECT_FALSE(geometry::HasIntersectionOfLine3dSegmentAndLine3dSegment(p1, p2, p3, p4, intersection));
 }
 
 TEST(UnitTest_IntersectionTwoLine3d, Skewl_1)
@@ -90,7 +90,7 @@ TEST(UnitTest_IntersectionTwoLine3d, Skewl_1)
     auto p3 = Eigen::Vector3d(5.0e0, 5.0e0, 5.0e0);
     auto p4 = Eigen::Vector3d(10.0e0, 10.0e0, 3.0e0);
     Eigen::Vector3d intersection;
-    EXPECT_TRUE(geometry::hasIntersectionOfLine3dSegmentAndLine3dSegment(p1, p2, p3, p4, intersection));
+    EXPECT_TRUE(geometry::HasIntersectionOfLine3dSegmentAndLine3dSegment(p1, p2, p3, p4, intersection));
     auto ans = Eigen::Vector3d(6.25e0, 6.25e0, 4.5e0);
     EXPECT_TRUE((ans - intersection).norm() < 1.0e-8);
 }
@@ -248,7 +248,7 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom)
             p4.y() = rand(mt);
             p4.z() = -1.0e0 * (pe.a_ * p4.x() + pe.b_ * p4.y() + pe.d_) / pe.c_;
             Eigen::Vector3d interesection;
-            if (!geometry::hasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
+            if (!geometry::HasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
             {
                 success = false;
                 break;
@@ -293,7 +293,7 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_SmallerOrder)
             p4.y() = rand(mt);
             p4.z() = -1.0e0 * (pe.a_ * p4.x() + pe.b_ * p4.y() + pe.d_) / pe.c_;
             Eigen::Vector3d interesection;
-            if (!geometry::hasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
+            if (!geometry::HasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
             {
                 success = false;
                 break;
@@ -338,7 +338,7 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_LargerOrder)
             p4.y() = rand(mt);
             p4.z() = -1.0e0 * (pe.a_ * p4.x() + pe.b_ * p4.y() + pe.d_) / pe.c_;
             Eigen::Vector3d interesection;
-            if (!geometry::hasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
+            if (!geometry::HasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, interesection))
             {
                 success = false;
                 break;
@@ -346,6 +346,43 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_LargerOrder)
         }
     }
     EXPECT_TRUE(success);
+}
+
+
+TEST(UnitTest_IntersectionLine3dAndPlane, CompareResult)
+{
+    { // ex1
+        // http://www.ambrsoft.com/TrigoCalc/Plan3D/PlaneLineIntersection_.htm
+        geometry::PlaneEquation pe;
+        pe.a_ = 3.0e0;
+        pe.b_ = -1.0e0;
+        pe.c_ = 2.0e0;
+        pe.d_ = -5.0e0;
+        Eigen::Vector3d intersection;
+        auto result = HasIntersectionLine3dAndPlane(Eigen::Vector3d(1.0e0, -1.0e0, 1.0e0),
+                                                    Eigen::Vector3d(-1.0e0, -4.0e0, 3.0e0),
+                                                    pe, intersection);
+        EXPECT_TRUE(result);
+        EXPECT_DOUBLE_EQ(intersection.x(), 3.0e0);
+        EXPECT_DOUBLE_EQ(intersection.y(), 2.0e0);
+        EXPECT_DOUBLE_EQ(intersection.z(), -1.0e0);
+    }
+    { // ex2
+        // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htm
+        // ex 1
+        geometry::PlaneEquation pe;
+        pe.a_ = 1.0e0;
+        pe.b_ = -2.0e0;
+        pe.c_ = 3.0e0;
+        pe.d_ = 10.0e0;
+        Eigen::Vector3d intersection;
+        auto result = HasIntersectionLine3dAndPlane(Eigen::Vector3d(1.0e0, 1.0e0, -4.0e0),
+                                                    Eigen::Vector3d(-5.0e0, 3.0e0, 0.0e0),
+                                                    pe, intersection);
+        EXPECT_DOUBLE_EQ(intersection.x(), -8.0e0);
+        EXPECT_DOUBLE_EQ(intersection.y(), 4.0e0);
+        EXPECT_NEAR(intersection.z() - 2.0e0, 0.0e0);
+    }
 }
 int main(int argc, char *argv[])
 {

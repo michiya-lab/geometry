@@ -28,7 +28,7 @@ namespace geometry
     double ComputeLengthPoint3dAndLine3d(const Eigen::Vector3d &query, const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                                          const double &eps = 1.0e-8);
 
-    bool hasIntersectionOfLine3dAndLine3d(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+    bool HasIntersectionOfLine3dAndLine3d(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                                           const Eigen::Vector3d &p3, const Eigen::Vector3d &p4,
                                           Eigen::Vector3d &intersection,
                                           const double &eps = 1.0e-8);
@@ -36,13 +36,14 @@ namespace geometry
     bool IsOnLineSegment(const Eigen::Vector3d &query, const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                          const double &eps = 1.0e-8);
 
-    bool hasIntersectionOfLine3dSegmentAndLine3dSegment(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+    bool HasIntersectionOfLine3dSegmentAndLine3dSegment(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                                                         const Eigen::Vector3d &p3, const Eigen::Vector3d &p4,
                                                         Eigen::Vector3d &intersection,
                                                         const double &eps = 1.0e-8);
 
     class PlaneEquation
     {
+        // ax + by + cz + d = 0
     public:
         PlaneEquation() { ; }
         virtual ~PlaneEquation() { ; }
@@ -71,6 +72,11 @@ namespace geometry
 
     bool IsInsidePolygon3d(const Eigen::Vector3d &query, const std::vector<Eigen::Vector3d> &points,
                            const double &eps = 1.0e-8);
+
+    bool HasIntersectionLine3dAndPlane(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+                                       const PlaneEquation &plane_eq,
+                                       Eigen::Vector3d &intersection,
+                                       const double &eps = 1.0e-8);
 } // namespace geometry
 
 

@@ -118,7 +118,7 @@ namespace geometry
         return ((p2 - p1).cross(p1 - query)).norm() / length_21;
     }
 
-    bool hasIntersectionOfLine3dAndLine3d(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+    bool HasIntersectionOfLine3dAndLine3d(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                                           const Eigen::Vector3d &p3, const Eigen::Vector3d &p4,
                                           Eigen::Vector3d &intersection,
                                           const double &eps)
@@ -149,12 +149,12 @@ namespace geometry
         return false;
     }
 
-    bool hasIntersectionOfLine3dSegmentAndLine3dSegment(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+    bool HasIntersectionOfLine3dSegmentAndLine3dSegment(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
                                                         const Eigen::Vector3d &p3, const Eigen::Vector3d &p4,
                                                         Eigen::Vector3d &intersection,
                                                         const double &eps)
     {
-        if (hasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, intersection, eps))
+        if (HasIntersectionOfLine3dAndLine3d(p1, p2, p3, p4, intersection, eps))
         {
             return (IsOnLineSegment(intersection, p1, p2) && IsOnLineSegment(intersection, p3, p4)) ? true : false;
         }
@@ -179,7 +179,7 @@ namespace geometry
 
     bool IsOnPlane(const Eigen::Vector3d &query, const PlaneEquation &plane_equation, const double &eps)
     {
-        return (plane_equation.a_ * query.x() + plane_equation.b_ * query.y() + plane_equation.c_ * query.z() + plane_equation.d_ < eps) ? true : false;
+        return (std::abs(plane_equation.a_ * query.x() + plane_equation.b_ * query.y() + plane_equation.c_ * query.z() + plane_equation.d_) < eps) ? true : false;
     }
 
     bool IsInsidePolygon3dRayCastingAlgorithm(const Eigen::Vector3d &query, const std::vector<Eigen::Vector3d> &points, const double &eps)
@@ -378,7 +378,7 @@ namespace geometry
                             edge_p1 = points[i];
                             edge_p2 = points[i + 1];
                         }
-                        if (hasIntersectionOfLine3dSegmentAndLine3dSegment(query, ray_point, edge_p1, edge_p2, intersection))
+                        if (HasIntersectionOfLine3dSegmentAndLine3dSegment(query, ray_point, edge_p1, edge_p2, intersection))
                         {
                             auto tol = eps * (edge_p2 - edge_p1).norm();
                             if ((intersection - edge_p2).squaredNorm() < tol * tol)
@@ -606,7 +606,7 @@ namespace geometry
                             edge_p1 = points[i];
                             edge_p2 = points[i + 1];
                         }
-                        if (hasIntersectionOfLine3dSegmentAndLine3dSegment(query, ray_point, edge_p1, edge_p2, intersection))
+                        if (HasIntersectionOfLine3dSegmentAndLine3dSegment(query, ray_point, edge_p1, edge_p2, intersection))
                         {
                             auto tol = eps * (edge_p2 - edge_p1).norm();
                             if ((intersection - edge_p2).squaredNorm() < tol * tol)
@@ -651,5 +651,64 @@ namespace geometry
     {
         return IsInsidePolygon3dRayCastingAlgorithm(query, points, eps);
         //return IsInsidePolygon3dWindingNumberAlgorithm(query, points, eps);
+    }
+
+    bool HasIntersectionLine3dAndPlane(const Eigen::Vector3d &p1, const Eigen::Vector3d &p2,
+                                       const PlaneEquation &plane_eq,
+                                       Eigen::Vector3d &intersection,
+                                       const double &eps)
+    {
+        if (IsOnPlane(p1, plane_eq))
+        {
+            intersection = p1;
+            return true;
+        } // if
+        else if (IsOnPlane(p2, plane_eq))
+        {
+            intersection = p2;
+            return true;
+        } // else if
+        {
+            auto tol = std::max({std::abs(p2.x() - p1.x()), std::abs(p2.y() - p1.y()), std::abs(p2.z() - p1.z())}) * eps;
+            if ((p2 - p1).norm() < tol)
+            {
+                // need to implement future
+                // find distance and that return point
+                return false;
+            }
+        }
+        Eigen::Vector3d point_on_plane;
+        if (std::abs(plane_eq.c_) > eps)
+        {
+            point_on_plane.x() = p2.x();
+            point_on_plane.y() = p2.y();
+            point_on_plane.z() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.b_ * point_on_plane.y() + plane_eq.d_) / plane_eq.c_;
+        }
+        else if (std::abs(plane_eq.b_) > eps)
+        {
+            point_on_plane.x() = p2.x();
+            point_on_plane.z() = p2.z();
+            point_on_plane.y() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.b_;
+        }
+        else if (std::abs(plane_eq.a_) > eps)
+        {
+            point_on_plane.y() = p2.y();
+            point_on_plane.z() = p2.z();
+            point_on_plane.x() = -1.0e0 * (plane_eq.b_ * point_on_plane.y() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.a_;
+        }
+        else
+        {
+            return false;
+        }
+        Eigen::Vector3d normal_vec(plane_eq.a_, plane_eq.b_, plane_eq.c_);
+        auto tol = (p2 - p1).norm() * eps;
+        auto dn21 = normal_vec.dot(p2 - p1);
+        if (std::abs(dn21) < tol)
+        {
+            return false;
+        } // if dn21 <eps
+        auto tmp = normal_vec.dot(point_on_plane - p1) / dn21;
+        intersection = p1 + (p2 - p1) * tmp;
+        return IsOnPlane(intersection, plane_eq);
     }
 } // namespace geometry

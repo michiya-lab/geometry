@@ -35,24 +35,6 @@ namespace geometry
         Point3d &operator=(Point3d &&) = default;      // move assignment operator
     };                                                 // class Point3d
 
-    class Line3d
-    {
-    public:
-        Line3d(){ ; }
-        virtual ~Line3d(){ ; }
-        Point3d *p1 = nullptr;
-        Point3d *p2 = nullptr;
-
-    private:
-        /* code */
-    public: // access member
-        /* code */
-    public: // oparator
-        Line3d(const Line3d&) = default; // copy constractor
-        Line3d(Line3d&&) = default; // move constractor
-        Line3d &operator=(const Line3d&) = default; // copy assignment operator
-        Line3d &operator=(Line3d&&) = default; // move assignment operator
-    }; // class Line3d
 } // namespace geometry
 
 #endif // POINT3D_HPP_
