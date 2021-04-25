@@ -1,4 +1,5 @@
 #include <geometry_tools.hpp>
+#include <iostream>
 
 namespace geometry
 {
@@ -174,12 +175,20 @@ namespace geometry
         pe.b_ = cross.y();
         pe.c_ = cross.z();
         pe.d_ = -1.0e0 * (pe.a_ * p1.x() + pe.b_ * p1.y() + pe.c_ * p1.z());
+        // { // scaling
+        //     pe.a_ *= pe.d_;
+        //     pe.b_ *= pe.d_;
+        //     pe.c_ *= pe.d_;
+        // }
         return pe;
     }
 
     bool IsOnPlane(const Eigen::Vector3d &query, const PlaneEquation &plane_equation, const double &eps)
     {
-        return (std::abs(plane_equation.a_ * query.x() + plane_equation.b_ * query.y() + plane_equation.c_ * query.z() + plane_equation.d_) < eps) ? true : false;
+        auto tol1 = std::abs(plane_equation.d_) * eps;
+        auto tol2 = std::max({std::abs(query.x()), std::abs(query.y()), std::abs(query.z())}) * eps;
+        auto tol = std::max(tol1, tol2);
+        return (std::abs(plane_equation.a_ * query.x() + plane_equation.b_ * query.y() + plane_equation.c_ * query.z() + plane_equation.d_) < tol) ? true : false;
     }
 
     bool IsInsidePolygon3dRayCastingAlgorithm(const Eigen::Vector3d &query, const std::vector<Eigen::Vector3d> &points, const double &eps)
@@ -674,41 +683,48 @@ namespace geometry
             {
                 // need to implement future
                 // find distance and that return point
+                std::cout << "not implement" << std::endl;
                 return false;
             }
         }
         Eigen::Vector3d point_on_plane;
-        if (std::abs(plane_eq.c_) > eps)
         {
-            point_on_plane.x() = p2.x();
-            point_on_plane.y() = p2.y();
-            point_on_plane.z() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.b_ * point_on_plane.y() + plane_eq.d_) / plane_eq.c_;
+            if (std::abs(plane_eq.c_) > eps)
+            {
+                point_on_plane.x() = p2.x();
+                point_on_plane.y() = p2.y();
+                point_on_plane.z() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.b_ * point_on_plane.y() + plane_eq.d_) / plane_eq.c_;
+            }
+            else if (std::abs(plane_eq.b_) > eps)
+            {
+                point_on_plane.x() = p2.x();
+                point_on_plane.z() = p2.z();
+                point_on_plane.y() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.b_;
+            }
+            else if (std::abs(plane_eq.a_) > eps)
+            {
+                point_on_plane.y() = p2.y();
+                point_on_plane.z() = p2.z();
+                point_on_plane.x() = -1.0e0 * (plane_eq.b_ * point_on_plane.y() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.a_;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else if (std::abs(plane_eq.b_) > eps)
         {
-            point_on_plane.x() = p2.x();
-            point_on_plane.z() = p2.z();
-            point_on_plane.y() = -1.0e0 * (plane_eq.a_ * point_on_plane.x() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.b_;
+            Eigen::Vector3d normal_vec(plane_eq.a_, plane_eq.b_, plane_eq.c_);
+            normal_vec.normalize();
+            auto tol = (p2 - p1).norm() * eps;
+            auto dn21 = normal_vec.dot(p2 - p1);
+            if (std::abs(dn21) < tol)
+            {
+                std::cout << "error2" << std::endl;
+                return false;
+            } // if dn21 <eps
+            auto tmp = normal_vec.dot(point_on_plane - p1) / dn21;
+            intersection = p1 + (p2 - p1) * tmp;
         }
-        else if (std::abs(plane_eq.a_) > eps)
-        {
-            point_on_plane.y() = p2.y();
-            point_on_plane.z() = p2.z();
-            point_on_plane.x() = -1.0e0 * (plane_eq.b_ * point_on_plane.y() + plane_eq.c_ * point_on_plane.z() + plane_eq.d_) / plane_eq.a_;
-        }
-        else
-        {
-            return false;
-        }
-        Eigen::Vector3d normal_vec(plane_eq.a_, plane_eq.b_, plane_eq.c_);
-        auto tol = (p2 - p1).norm() * eps;
-        auto dn21 = normal_vec.dot(p2 - p1);
-        if (std::abs(dn21) < tol)
-        {
-            return false;
-        } // if dn21 <eps
-        auto tmp = normal_vec.dot(point_on_plane - p1) / dn21;
-        intersection = p1 + (p2 - p1) * tmp;
         return IsOnPlane(intersection, plane_eq);
     }
 } // namespace geometry

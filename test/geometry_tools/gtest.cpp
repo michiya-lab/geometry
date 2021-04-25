@@ -7,6 +7,7 @@
 namespace
 {
     std::vector<std::string> gtest_args;
+    constexpr double tol_gtest = 1.0e-12;
 }
 
 TEST(UNIT_TEST_01, PASS_CASE01)
@@ -21,7 +22,7 @@ TEST(UnitTest_LengthPontAndLine3D, On2D_1)
     auto p1 = Eigen::Vector3d(0.0e0, 2.0e0, 0.0e0);
     auto p2 = Eigen::Vector3d(3.0e0, 1.0e0, 0.0e0);
     auto dist = geometry::ComputeLengthPoint3dAndLine3d(query, p1, p2);
-    EXPECT_DOUBLE_EQ(dist, 2.0e0 * std::sqrt(10.0e0));
+    EXPECT_NEAR(dist, 2.0e0 * std::sqrt(10.0e0), tol_gtest);
 }
 TEST(UnitTest_LengthPontAndLine3D, On2D_2)
 {
@@ -30,7 +31,7 @@ TEST(UnitTest_LengthPontAndLine3D, On2D_2)
     auto p1 = Eigen::Vector3d(0.0e0, -4.0e0, 0.0e0);
     auto p2 = Eigen::Vector3d(1.0e0, -1.0e0, 0.0e0);
     auto dist = geometry::ComputeLengthPoint3dAndLine3d(query, p1, p2);
-    EXPECT_DOUBLE_EQ(dist, 2.0e0 * std::sqrt(10.0e0) / 5.0e0);
+    EXPECT_NEAR(dist, 2.0e0 * std::sqrt(10.0e0) / 5.0e0, tol_gtest);
 }
 TEST(UnitTest_LengthPontAndLine3D, On3D_1)
 {
@@ -39,7 +40,7 @@ TEST(UnitTest_LengthPontAndLine3D, On3D_1)
     auto p1 = Eigen::Vector3d(5.0e0, 2.0e0, 1.0e0);
     auto p2 = Eigen::Vector3d(1.0e0, -0.0e0, -3.0e0);
     auto dist = geometry::ComputeLengthPoint3dAndLine3d(query, p1, p2);
-    EXPECT_DOUBLE_EQ(dist, 5.0e0);
+    EXPECT_NEAR(dist, 5.0e0, tol_gtest);
 }
 TEST(UnitTest_LengthPontAndLine3D, On3D_2)
 {
@@ -48,7 +49,7 @@ TEST(UnitTest_LengthPontAndLine3D, On3D_2)
     auto p1 = Eigen::Vector3d(4.0e0, 2.0e0, 1.0e0);
     auto p2 = Eigen::Vector3d(3.0e0, 2.0e0, 1.0e0);
     auto dist = geometry::ComputeLengthPoint3dAndLine3d(query, p1, p2);
-    EXPECT_DOUBLE_EQ(dist, 1.0e0);
+    EXPECT_NEAR(dist, 1.0e0, tol_gtest);
 }
 TEST(UnitTest_ShortestDistanceTwoLine3d, Skew2D)
 {
@@ -57,7 +58,7 @@ TEST(UnitTest_ShortestDistanceTwoLine3d, Skew2D)
     auto p3 = Eigen::Vector3d(1.0e0, -1.0e0, 0.0e0);
     auto p4 = Eigen::Vector3d(3.0e0, 1.0e0, 0.0e0);
     auto shortest = geometry::ComputeShortestLine3dBetweenLine3dAndLine3d(p1, p2, p3, p4);
-    EXPECT_LT((shortest.second - shortest.first).norm(), 1.0e-10);
+    EXPECT_NEAR((shortest.second - shortest.first).norm(), 0.0e0, tol_gtest);
 }
 TEST(UnitTest_ShortestDistanceTwoLine3d, Parallel2D)
 {
@@ -68,7 +69,7 @@ TEST(UnitTest_ShortestDistanceTwoLine3d, Parallel2D)
     auto p4 = Eigen::Vector3d(1.0e0, -5.0e0, 0.0e0);
     EXPECT_TRUE(geometry::IsParallel(p1, p2, p3, p4));
     auto shortest = geometry::ComputeShortestLine3dBetweenLine3dAndLine3d(p1, p2, p3, p4);
-    EXPECT_DOUBLE_EQ((shortest.second - shortest.first).norm(), 2.0e0 * std::sqrt(10.0e0));
+    EXPECT_NEAR((shortest.second - shortest.first).norm(), 2.0e0 * std::sqrt(10.0e0), tol_gtest);
 }
 TEST(UnitTest_IntersectionTwoLine3d, Paralell_1)
 {
@@ -92,7 +93,7 @@ TEST(UnitTest_IntersectionTwoLine3d, Skewl_1)
     Eigen::Vector3d intersection;
     EXPECT_TRUE(geometry::HasIntersectionOfLine3dSegmentAndLine3dSegment(p1, p2, p3, p4, intersection));
     auto ans = Eigen::Vector3d(6.25e0, 6.25e0, 4.5e0);
-    EXPECT_TRUE((ans - intersection).norm() < 1.0e-8);
+    EXPECT_NEAR((ans - intersection).norm(), 0.0e0, tol_gtest);
 }
 
 TEST(UnitTest_IntersectionTwoLine3d, ParallelRandom)
@@ -302,7 +303,7 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_SmallerOrder)
     }
     EXPECT_TRUE(success);
 }
-TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_LargerOrder)
+TEST(UnitTest_IntersectionTwoLine3d, Random)
 {
     // all points must be paralell
     bool success = true;
@@ -348,7 +349,6 @@ TEST(UnitTest_IntersectionTwoLine3d, SkewRandom_LargerOrder)
     EXPECT_TRUE(success);
 }
 
-
 TEST(UnitTest_IntersectionLine3dAndPlane, CompareResult)
 {
     { // ex1
@@ -363,9 +363,9 @@ TEST(UnitTest_IntersectionLine3dAndPlane, CompareResult)
                                                     Eigen::Vector3d(-1.0e0, -4.0e0, 3.0e0),
                                                     pe, intersection);
         EXPECT_TRUE(result);
-        EXPECT_DOUBLE_EQ(intersection.x(), 3.0e0);
-        EXPECT_DOUBLE_EQ(intersection.y(), 2.0e0);
-        EXPECT_DOUBLE_EQ(intersection.z(), -1.0e0);
+        EXPECT_NEAR(intersection.x(), 3.0e0, tol_gtest);
+        EXPECT_NEAR(intersection.y(), 2.0e0, tol_gtest);
+        EXPECT_NEAR(intersection.z(), -1.0e0, tol_gtest);
     }
     { // ex2
         // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htm
@@ -379,10 +379,118 @@ TEST(UnitTest_IntersectionLine3dAndPlane, CompareResult)
         auto result = HasIntersectionLine3dAndPlane(Eigen::Vector3d(1.0e0, 1.0e0, -4.0e0),
                                                     Eigen::Vector3d(-5.0e0, 3.0e0, 0.0e0),
                                                     pe, intersection);
-        EXPECT_DOUBLE_EQ(intersection.x(), -8.0e0);
-        EXPECT_DOUBLE_EQ(intersection.y(), 4.0e0);
-        EXPECT_NEAR(intersection.z() - 2.0e0, 0.0e0);
+        EXPECT_NEAR(intersection.x(), -8.0e0, tol_gtest);
+        EXPECT_NEAR(intersection.y(), 4.0e0, tol_gtest);
+        EXPECT_NEAR(intersection.z(), 2.0e0, tol_gtest);
     }
+}
+
+TEST(UnitTest_IntersectionLine3dAndPlane, Random)
+{
+    constexpr double val_range = 1.0e0;
+    std::vector<Eigen::Vector3d> points;
+    { // create triangle
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+    }
+    bool success = true;
+    { // intersection
+        auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        std::vector<Eigen::Vector3d> intersections_inside;
+        std::vector<Eigen::Vector3d> intersections_outside;
+        for (std::size_t i = 0; i < 10000; i++)
+        {
+            std::vector<Eigen::Vector3d> points_line;
+            Eigen::Vector3d intersect;
+            auto p1 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            auto p2 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            if (!geometry::HasIntersectionLine3dAndPlane(p1, p2, pe, intersect))
+            {
+                success = false;
+                break;
+            }
+        }
+    }
+    EXPECT_TRUE(success);
+}
+
+TEST(UnitTest_IntersectionLine3dAndPlane, Random_SmallerOrder)
+{
+    constexpr double val_range = 1.0e-20;
+    std::vector<Eigen::Vector3d> points;
+    { // create triangle
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+    }
+    bool success = true;
+    { // intersection
+        auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        std::vector<Eigen::Vector3d> intersections_inside;
+        std::vector<Eigen::Vector3d> intersections_outside;
+        for (std::size_t i = 0; i < 10000; i++)
+        {
+            std::vector<Eigen::Vector3d> points_line;
+            Eigen::Vector3d intersect;
+            auto p1 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            auto p2 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            if (!geometry::HasIntersectionLine3dAndPlane(p1, p2, pe, intersect))
+            {
+                success = false;
+                break;
+            }
+        }
+    }
+    EXPECT_TRUE(success);
+}
+
+TEST(UnitTest_IntersectionLine3dAndPlane, Random_LargerOrder)
+{
+    constexpr double val_range = 1.0e+20;
+    std::vector<Eigen::Vector3d> points;
+    { // create triangle
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+    }
+    bool success = true;
+    { // intersection
+        auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        std::vector<Eigen::Vector3d> intersections_inside;
+        std::vector<Eigen::Vector3d> intersections_outside;
+        for (std::size_t i = 0; i < 10000; i++)
+        {
+            std::vector<Eigen::Vector3d> points_line;
+            Eigen::Vector3d intersect;
+            auto p1 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            auto p2 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            if (!geometry::HasIntersectionLine3dAndPlane(p1, p2, pe, intersect))
+            {
+                success = false;
+                break;
+            }
+        }
+    }
+    EXPECT_TRUE(success);
 }
 int main(int argc, char *argv[])
 {

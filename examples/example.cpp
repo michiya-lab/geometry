@@ -111,349 +111,139 @@ namespace
 
 int main()
 {
-    {
-        // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htm
-        // ex. 1
-        std::cout << "ex. 1" << std::endl;
-        geometry::PlaneEquation pe;
-        pe.a_ = 1.0e0;
-        pe.b_ = -2.0e0;
-        pe.c_ = 3.0e0;
-        pe.d_ = 10.0e0;
-        Eigen::Vector3d intersection;
-        std::cout << HasIntersectionLine3dAndPlane(Eigen::Vector3d(1.0e0, 1.0e0, -4.0e0),
-                                                   Eigen::Vector3d(-5.0e0, 3.0e0, 0.0e0),
-                                                   pe, intersection)
-                  << std::endl;
-        std::cout << intersection << std::endl;
-    }
-    {
-        // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htma
-        // ex. 1.1
-        std::cout << "ex. 1.1" << std::endl;
-        geometry::PlaneEquation pe;
-        pe.a_ = 2.0e0;
-        pe.b_ = -1.0e0;
-        pe.c_ = 2.0e0;
-        pe.d_ = -2.0e0;
-        Eigen::Vector3d intersection;
-        std::cout << HasIntersectionLine3dAndPlane(Eigen::Vector3d(3.0e0, -4.0e0, 5.0e0),
-                                                   Eigen::Vector3d(5.0e0, -1.0e0, 9.0e0),
-                                                   pe, intersection)
-                  << std::endl;
-        std::cout << intersection << std::endl;
-    }
-    {
-        // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htma
-        // ex. 1.2
-        std::cout << "ex. 1.2" << std::endl;
-        geometry::PlaneEquation pe;
-        pe.a_ = 1.0e0;
-        pe.b_ = 1.0e0;
-        pe.c_ = 2.0e0;
-        pe.d_ = 1.0e0;
-        Eigen::Vector3d intersection;
-        std::cout << HasIntersectionLine3dAndPlane(Eigen::Vector3d(2.0e0, 0.0e0, 1.0e0),
-                                                   Eigen::Vector3d(3.0e0, -2.0e0, 4.0e0),
-                                                   pe, intersection)
-                  << std::endl;
-        std::cout << intersection << std::endl;
-    }
-    {
-        // https://www.geisya.or.jp/~mwm48961/linear_algebra/line_plane3.htma
-        // ex. 1.3
-        std::cout << "ex. 1.3" << std::endl;
-        geometry::PlaneEquation pe;
-        pe.a_ = 3.0e0;
-        pe.b_ = -2.0e0;
-        pe.c_ = 4.0e0;
-        pe.d_ = -9.0e0;
-        Eigen::Vector3d intersection;
-        std::cout << HasIntersectionLine3dAndPlane(Eigen::Vector3d(-1.0e0, 2.0e0, 1.0e0),
-                                                   Eigen::Vector3d(-3.0e0, 5.0e0, 1.0e0),
-                                                   pe, intersection)
-                  << std::endl;
-        std::cout << intersection << std::endl;
-    }
-    return 0;
-    {
-        std::vector<Eigen::Vector3d> points;
-        { // create triangl
-            std::random_device rnd;
-            std::mt19937 mt(rnd());
-            std::uniform_real_distribution<double> rand(-1.0e+0, 1.0e+0);
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            { // triangle vtk
-                std::ofstream ofs("triangle.vtk");
-                ofs << "# vtk DataFile Version 2.0" << std::endl
-                    << "polygon" << std::endl
-                    << "ASCII" << std::endl
-                    << "DATASET UNSTRUCTURED_GRID" << std::endl
-                    << "POINTS " << points.size() << " double" << std::endl;
-                for (const auto &p : points)
-                {
-                    ofs << std::setprecision(13)
-                        << p.x() << " "
-                        << p.y() << " "
-                        << p.z() << std::endl;
-                } // for points
-                ofs << "CELLS 1 " << points.size() + 1 << " " << std::endl
-                    << points.size() << " ";
-                for (std::size_t i = 0; i < points.size(); ++i)
-                {
-                    ofs << i << " ";
-                } // for i
-                ofs << std::endl
-                    << "CELL_TYPES 1" << std::endl
-                    << "7" << std::endl;
-                ofs.close();
-            }
-        }std::vector<Eigen::Vector3d> points_line;
-        { // create triangl
-            std::random_device rnd;
-            std::mt19937 mt(rnd());
-            std::uniform_real_distribution<double> rand(-1.0e+0, 1.0e+0);
-            points_line.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            points_line.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            { // triangle vtk
-                std::ofstream ofs("line.vtk");
-                ofs << "# vtk DataFile Version 2.0" << std::endl
-                    << "polygon" << std::endl
-                    << "ASCII" << std::endl
-                    << "DATASET UNSTRUCTURED_GRID" << std::endl
-                    << "POINTS " << points_line.size() << " double" << std::endl;
-                for (const auto &p : points_line)
-                {
-                    ofs << std::setprecision(13)
-                        << p.x() << " "
-                        << p.y() << " "
-                        << p.z() << std::endl;
-                } // for points
-                ofs << "CELLS 1 " << points_line.size() + 1 << " " << std::endl
-                    << points_line.size() << " ";
-                for (std::size_t i = 0; i < points_line.size(); ++i)
-                {
-                    ofs << i << " ";
-                } // for i
-                ofs << std::endl
-                    << "CELL_TYPES 1" << std::endl
-                    << "3" << std::endl;
-                ofs.close();
-            }
-        }
-        {
-            auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
-            Eigen::Vector3d intersection;
-            std::cout << HasIntersectionLine3dAndPlane(points_line[0], points_line[1], pe, intersection) << std::endl;
-            std::cout << "point1" << std::endl;
-            std::cout << points[0] << std::endl;
-            std::cout << "point2" << std::endl;
-            std::cout << points[1] << std::endl;
-            std::cout << "point3" << std::endl;
-            std::cout << points[2] << std::endl;
-            std::cout << "point_line1" << std::endl;
-            std::cout << points_line[0] << std::endl;
-            std::cout << "point_line2" << std::endl;
-            std::cout << points_line[1] << std::endl;
-            std::cout << "intersection" << std::endl;
-            std::cout << intersection << std::endl;
-        }
-    }
-    return 0;
-    {
-        std::vector<std::unique_ptr<geometry::Point3d>> points;
-        std::vector<std::unique_ptr<geometry::Face3d>> faces;
-        {
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-5.50E+01, 6.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 2.00E+01));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 4.00E+01, 0.00E+00));
-            points.push_back(std::make_unique<geometry::Point3d>(-3.50E+01, 6.00E+01, 0.00E+00));
-        }
-        {
-            for (std::size_t i = 0; i < points.size(); i += 3)
-            {
-                auto face = std::make_unique<geometry::Face3d>();
-                face->points_.push_back(points[i].get());
-                face->points_.push_back(points[i + 1].get());
-                face->points_.push_back(points[i + 2].get());
-                faces.push_back(std::move(face));
-            } // for i
-        }
-        return 0;
-        {
-            std::vector<geometry::Face3d> faces_print;
-            for (const auto& f: faces)
-            {
-                faces_print.push_back(*f.get());
-            } // for face
-            write_vtk("faces.vtk", faces_print);
-        }
-    }
-    return 0;
-    {
+    constexpr double val_range = 1.0e+20;
+    std::vector<Eigen::Vector3d> points;
+    { // create triangle
         std::random_device rnd;
         std::mt19937 mt(rnd());
-        std::uniform_real_distribution<double> rand(-1.0e+16, 1.0e+16);
-        std::vector<Eigen::Vector3d> points;
-        { // create polygon
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
-            auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
-            for (std::size_t i = 0; i < 2; ++i)
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        points.push_back(Eigen::Vector3d(rand(mt), rand(mt), rand(mt)));
+        { // triangle vtk
+            std::ofstream ofs("triangle.vtk");
+            ofs << "# vtk DataFile Version 2.0" << std::endl
+                << "polygon" << std::endl
+                << "ASCII" << std::endl
+                << "DATASET UNSTRUCTURED_GRID" << std::endl
+                << "POINTS " << points.size() << " double" << std::endl;
+            for (const auto &p : points)
             {
-                if (std::abs(pe.c_) > 1.0e-8)
-                {
-                    Eigen::Vector3d p1;
-                    p1.x() = rand(mt);
-                    p1.y() = rand(mt);
-                    p1.z() = -1.0e0 * (pe.a_ * p1.x() + pe.b_ * p1.y() + pe.d_) / pe.c_;
-                    points.push_back(p1);
-                }
+                ofs << std::setprecision(13)
+                    << p.x() << " "
+                    << p.y() << " "
+                    << p.z() << std::endl;
+            } // for points
+            ofs << "CELLS 1 " << points.size() + 1 << " " << std::endl
+                << points.size() << " ";
+            for (std::size_t i = 0; i < points.size(); ++i)
+            {
+                ofs << i << " ";
             } // for i
-            { // triangle vtk
-                std::ofstream ofs("polygon.vtk");
-                ofs << "# vtk DataFile Version 2.0" << std::endl
-                    << "polygon" << std::endl
-                    << "ASCII" << std::endl
-                    << "DATASET UNSTRUCTURED_GRID" << std::endl
-                    << "POINTS " << points.size() << " double" << std::endl;
-                for (const auto &p : points)
+            ofs << std::endl
+                << "CELL_TYPES 1" << std::endl
+                << "7" << std::endl;
+            ofs.close();
+        }
+    }
+    { // intersection
+        auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
+        std::cout << "plane equation is "
+                  << pe.a_ << " , "
+                  << pe.b_ << " , "
+                  << pe.c_ << " , "
+                  << pe.d_ << " , "
+                  << std::endl;
+        std::random_device rnd;
+        std::mt19937 mt(rnd());
+        std::uniform_real_distribution<double> rand(-val_range, val_range);
+        std::vector<Eigen::Vector3d> intersections_inside;
+        std::vector<Eigen::Vector3d> intersections_outside;
+        for (std::size_t i = 0; i < 100000; i++)
+        {
+            std::vector<Eigen::Vector3d> points_line;
+            Eigen::Vector3d intersect;
+            auto p1 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            auto p2 = Eigen::Vector3d(rand(mt), rand(mt), rand(mt));
+            if (geometry::HasIntersectionLine3dAndPlane(p1, p2, pe, intersect))
+            {
+                if (geometry::IsInsidePolygon3d(intersect, points))
                 {
-                    ofs << std::setprecision(13)
-                        << p.x() << " "
-                        << p.y() << " "
-                        << p.z() << std::endl;
-                } // for points
-                ofs << "CELLS 1 " << points.size() + 1 << " " << std::endl
-                    << points.size() << " ";
-                for (std::size_t i = 0; i < points.size(); ++i)
+                    intersections_inside.push_back(intersect);
+                }
+                else
                 {
-                    ofs << i << " ";
-                } // for i
-                ofs << std::endl
-                    << "CELL_TYPES 1" << std::endl
-                    << "7" << std::endl;
-                ofs.close();
+                    // std::cout << "check_outside" << std::endl;
+                    // std::cout << "p1" << std::endl;
+                    // std::cout << p1 << std::endl;
+                    // std::cout << "p2" << std::endl;
+                    // std::cout << p2 << std::endl;
+                    // std::cout << "intersection" << std::endl;
+                    // std::cout << intersect << std::endl;
+                    intersections_outside.push_back(intersect);
+                }
             }
         }
-//
-        auto pe = geometry::GetPlaneEquation(points[0], points[1], points[2]);
-        std::vector<Eigen::Vector3d> queries;
-        std::size_t count = 0;
-        for (std::size_t i = 0; i < 10000 * 10; ++i)
-        {
-            Eigen::Vector3d p;
-            p.x() = rand(mt);
-            p.y() = rand(mt);
-            p.z() = -1.0e0 * (pe.a_ * p.x() + pe.b_ * p.y() + pe.d_) / pe.c_;
-            queries.push_back(p);
-            if (geometry::IsInsidePolygon3d(p, points))
-            {
-                count++;
-            }
-        } // for i
-        std::cout << "inside / outside is " << count << " / " << queries.size() - count << std::endl;
-        {
-            std::ofstream ofs;
-            ofs.open("points_inside.vtk");
+        std::cout << "inside/outside = "
+                  << intersections_inside.size() << "/" << intersections_outside.size()
+                  << std::endl;
+        std::cout << "total = " << intersections_inside.size() + intersections_outside.size() << std::endl;
+        { // intersection inside
+            std::ofstream ofs("inside.vtk");
             ofs << "# vtk DataFile Version 2.0" << std::endl
-                << "points" << std::endl
+                << "polygon" << std::endl
                 << "ASCII" << std::endl
-                << "DATASET UNSTRUCTURED_GRID " << std::endl
-                << "POINTS " << count << " double"
-                << std::endl;
-            for (std::size_t i = 0; i < queries.size(); ++i)
+                << "DATASET UNSTRUCTURED_GRID" << std::endl
+                << "POINTS " << intersections_inside.size() << " double" << std::endl;
+            for (const auto &p : intersections_inside)
             {
-                if (geometry::IsInsidePolygon3d(queries[i], points))
-                {
-                    ofs << std::setprecision(13)
-                        << queries[i].x() << "  "
-                        << queries[i].y() << "  "
-                        << queries[i].z() << std::endl;
-                }
-            } // for i
-            ofs << "CELLS " << count << " " << count * 2 << std::endl;
-            for (std::size_t i = 0; i < count; ++i)
+                ofs << std::setprecision(13)
+                    << p.x() << " "
+                    << p.y() << " "
+                    << p.z() << std::endl;
+            } // for points
+            ofs << "CELLS " << intersections_inside.size() << " " << intersections_inside.size() * 2 << " " << std::endl;
+            for (std::size_t i = 0; i < intersections_inside.size(); ++i)
             {
-                ofs << "1 " << i << " ";
+                ofs << " 1 " << i << " ";
             } // for i
             ofs << std::endl;
-            ofs << "CELL_TYPES " << count << std::endl;
-            for (std::size_t i = 0; i < count; ++i)
+            ofs << "CELL_TYPES " << intersections_inside.size() << std::endl;
+            for (std::size_t i = 0; i < intersections_inside.size(); ++i)
             {
-                ofs << "1 ";
+                ofs << " 1 ";
             } // for i
             ofs << std::endl;
             ofs.close();
         }
-        {
-            std::ofstream ofs;
-            ofs.open("points_outside.vtk");
+        { // intersection outside
+            std::ofstream ofs("outside.vtk");
             ofs << "# vtk DataFile Version 2.0" << std::endl
-                << "points" << std::endl
+                << "point" << std::endl
                 << "ASCII" << std::endl
-                << "DATASET UNSTRUCTURED_GRID " << std::endl
-                << "POINTS " << queries.size() - count << " double"
-                << std::endl;
-            for (std::size_t i = 0; i < queries.size(); ++i)
+                << "DATASET UNSTRUCTURED_GRID" << std::endl
+                << "POINTS " << intersections_outside.size() << " double" << std::endl;
+            for (const auto &p : intersections_outside)
             {
-                if (!geometry::IsInsidePolygon3d(queries[i], points))
-                {
-                    ofs << std::setprecision(13)
-                        << queries[i].x() << "  "
-                        << queries[i].y() << "  "
-                        << queries[i].z() << std::endl;
-                }
-            } // for i
-            ofs << "CELLS " << queries.size() - count << " " << (queries.size() - count) * 2 << std::endl;
-            for (std::size_t i = 0; i < queries.size() - count; ++i)
+                ofs << std::setprecision(13)
+                    << p.x() << " "
+                    << p.y() << " "
+                    << p.z() << std::endl;
+            } // for points
+            ofs << "CELLS " << intersections_outside.size() << " " << intersections_outside.size() * 2 << " " << std::endl;
+            for (std::size_t i = 0; i < intersections_outside.size(); ++i)
             {
-                ofs << "1 " << i << " ";
+                ofs << " 1 " << i << " ";
             } // for i
             ofs << std::endl;
-            ofs << "CELL_TYPES " << queries.size() - count << std::endl;
-            for (std::size_t i = 0; i < queries.size() - count; ++i)
+            ofs << "CELL_TYPES " << intersections_outside.size() << std::endl;
+            for (std::size_t i = 0; i < intersections_outside.size(); ++i)
             {
-                ofs << "1 ";
+                ofs << " 1 ";
             } // for i
             ofs << std::endl;
             ofs.close();
         }
     }
     return 0;
-    }
+}
