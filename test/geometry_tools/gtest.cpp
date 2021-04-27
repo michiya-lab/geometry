@@ -492,6 +492,30 @@ TEST(UnitTest_IntersectionLine3dAndPlane, Random_LargerOrder)
     }
     EXPECT_TRUE(success);
 }
+
+TEST(UnitTest_DistancePoint3dAndPlane3d, EX1)
+{
+    auto p = Eigen::Vector3d(1.0e0, 2.0e0, 3.0e0);
+    geometry::PlaneEquation pe;
+    pe.a_ = 0.0e0;
+    pe.b_ = 4.0e0;
+    pe.c_ = 3.0e0;
+    pe.d_ = 5.0e0;
+    EXPECT_NEAR(geometry::ComputeDistancePoint3dAndPlane3d(p, pe), 4.4e0, tol_gtest);
+}
+
+TEST(UnitTest_DistancePoint3dAndPlane3d, CompareTwoWay)
+{
+    auto p = Eigen::Vector3d(1.0e0, 2.0e0, 3.0e0);
+    geometry::PlaneEquation pe;
+    pe.a_ = 0.0e0;
+    pe.b_ = 4.0e0;
+    pe.c_ = 3.0e0;
+    pe.d_ = 5.0e0;
+    auto intersect = geometry::FindFootOfPerpendicularPoint3dOnPlane3d(p, pe);
+    EXPECT_NEAR(geometry::ComputeDistancePoint3dAndPlane3d(p, pe), (p - intersect).norm(), tol_gtest);
+}
+
 int main(int argc, char *argv[])
 {
     ::testing::InitGoogleTest(&argc, argv);

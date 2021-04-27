@@ -726,4 +726,41 @@ namespace geometry
         }
         return IsOnPlane(intersection, plane_eq);
     }
+
+    double ComputeDistancePoint3dAndPlane3d(const Eigen::Vector3d &point, const PlaneEquation &plane_eq,
+                                            const double eps)
+    {
+        // https://keisan.casio.jp/exec/system/1202458240
+        double denom_square = plane_eq.a_ * plane_eq.a_ + plane_eq.b_ * plane_eq.b_ + plane_eq.c_ * plane_eq.c_;
+        {
+            auto tol = std::max({std::abs(plane_eq.a_), std::abs(plane_eq.b_), std::abs(plane_eq.c_)}) * eps;
+            if (std::abs(denom_square) < tol * tol)
+                return 0.0e0;
+        }
+        double numer = plane_eq.a_ * point.x() + plane_eq.b_ * point.y() + plane_eq.c_ * point.z() + plane_eq.d_;
+        {
+            auto tol = std::max({std::abs(plane_eq.a_), std::abs(plane_eq.b_), std::abs(plane_eq.c_)}) *
+                       std::max({std::abs(point.x()), std::abs(point.y()), std::abs(point.z())}) * eps;
+            if (std::abs(numer) < tol)
+                return 0.0e0;
+        }
+        return std::abs(numer) / std::sqrt(denom_square);
+    }
+
+    Eigen::Vector3d FindFootOfPerpendicularPoint3dOnPlane3d(const Eigen::Vector3d &point, const PlaneEquation &plane_eq,
+                                                            const double eps)
+    {
+        // https://www.geeksforgeeks.org/find-the-foot-of-perpendicular-of-a-point-in-a-3-d-plane/
+        // https://nekojara.city/math-point-project-on-plane
+        // https://hiraocafe.com/note/plane_equation.html
+        double denom = plane_eq.a_ * plane_eq.a_ + plane_eq.b_ * plane_eq.b_ + plane_eq.c_ * plane_eq.c_;
+        {
+            auto tol = std::max({std::abs(plane_eq.a_), std::abs(plane_eq.b_), std::abs(plane_eq.c_)}) * eps;
+            if (denom < tol * tol)
+                return point;
+        }
+        double numer = -1.0e0 * (plane_eq.a_ * point.x() + plane_eq.b_ * point.y() + plane_eq.c_ * point.z() + plane_eq.d_);
+        auto normal_vec = Eigen::Vector3d(plane_eq.a_, plane_eq.b_, plane_eq.c_);
+        return point + numer / denom * normal_vec;
+    }
 } // namespace geometry

@@ -77,6 +77,13 @@ namespace geometry
                                        const PlaneEquation &plane_eq,
                                        Eigen::Vector3d &intersection,
                                        const double &eps = 1.0e-8);
+
+    double ComputeDistancePoint3dAndPlane3d(const Eigen::Vector3d &point, const PlaneEquation &plane_eq,
+                                            const double eps = 1.0e-8);
+
+    Eigen::Vector3d FindFootOfPerpendicularPoint3dOnPlane3d(const Eigen::Vector3d &point, const PlaneEquation &plane_eq,
+                                                            const double eps = 1.0e-8);
+
 } // namespace geometry
 
 
