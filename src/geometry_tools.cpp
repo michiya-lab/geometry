@@ -719,7 +719,6 @@ namespace geometry
             auto dn21 = normal_vec.dot(p2 - p1);
             if (std::abs(dn21) < tol)
             {
-                std::cout << "error2" << std::endl;
                 return false;
             } // if dn21 <eps
             auto tmp = normal_vec.dot(point_on_plane - p1) / dn21;
